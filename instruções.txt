@@ -1,0 +1,19 @@
+Guia da formata��o referente aos arquivos de entrada dos algoritmos de AFD
+
+1� linha : Representa todos os estados descritos para o aut�mato, separados por espaceamento simples
+   Exemplo: "0 1 2"
+
+2� linha : Representa os s�mbolos do alfabeto, separados por espaceamento simples 
+   Exemplo: "0 1"
+
+3� linha : Representa o estado inicial do aut�mato
+   Exemplo: "0"
+
+4� linha : Represanta os estados finais do aut�mato
+   Exemplo: "2"
+
+5� linha: Representa o conjuto de transi��es poss�veis para o determinado aut�mato. Cada transi��o est� representada na forma de uma tripla (x,y,z) , onde x � o estado atual, y � o simbolo atual lido da cadeia e z � o estado resultante dessa fun��o
+   Exemplo: "(0,0,1) (0,1,0) (1,0,1) (1,1,2) (2,0,2) (2,1,2)"
+
+6� Linha: Represeenta a cadeia a ser testada pelo aut�mato, sem espaceamento antes ou depois da cadeia, a não ser que seja desejado
+   Exemplo: "000010100001" 
