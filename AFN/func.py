@@ -1,7 +1,3 @@
-f = open("casoAFN.txt","r")
-out = open("out.txt","w")
-
-listaFinal = []
 
 def set_estados(listaEst):
     matches = [x for x in listaEst if (x not in listaFinal)]    
@@ -73,7 +69,7 @@ def preparaTransicoesAFN_AFD(estados):
             prox = calculaProxEstado(est,alf)
             #print(est," lendo ",alf," vai para ",prox)
             listaEst.append((est,alf,remove_vazio_e_junta(prox)))       
-
+    print(listaEst)
     return listaEst
 
 def calculaProxEstado(Q,simbol):
@@ -118,19 +114,19 @@ def printa_transicoes(t):
             out.write("\n")
 
 def AFNtoAFD():
-   
-    printa_estados(estadosAFD)
+    estad = preparaEstadosAFN_AFD()
+    printa_estados(estad)
     printa_alfabeto()
     out.write(str(estadoInicial))
     out.write("\n")
     printa_finais()
-    printa_transicoes(transicoesFinais)
+    printa_transicoes(preparaTransicoesAFN_AFD(estad))
 
 def pertence_alfabeto(a):
-    
-    for x in alfabeto:
-        if x == a:        
-            return  True
+    if a in alfabeto:
+        return True
+    else:
+        return False
 
 def confere_final(l):
     for f in finaisI:
@@ -139,6 +135,7 @@ def confere_final(l):
                 if(x == f):
                     return True
     return False
+
 
 def processaAFN(q,pos):
 
@@ -161,7 +158,7 @@ def processaAFN(q,pos):
     print("aaaaaaaa")
     for i in q:
         for t in transicoes:
-            if(t[0]==i and t[1]==cadeia[pos]):
+            if(t[0]==int(i) and t[1]==cadeia[pos]):
                 pos+=1
                 print(q," lendo ",cadeia[pos]," leva a ",t[2])
                 for es in t[2]:
@@ -169,126 +166,48 @@ def processaAFN(q,pos):
                         processaAFN(es)
     return False
 
-def processaAFN2(q,num):
-    print("Estado atual = ",q)
-    print("simbolo atual = ",cadeia[num]," pos = ",num)
-    if(not pertence_alfabeto(cadeia[num]) or q==[]):
-        print('4')
+
+
+
+
+def processaAFN2(q,pos):
+
+    if(pertence_alfabeto(cadeia[pos]) == False):
+        print("simbolo ",cadeia[pos]," eh invalido")
+        print("nao certinho")
         return False
-    
-    proxEstados = []
-    for s in q:
-        for est in transicoesFinais:
-            if(est[0] == s and est[1]==cadeia[num] and est[2]!= []):
-                proxEstados.append(est[2])
 
-    print("proxEstados = ",proxEstados)
-    prox= []
-    for i in proxEstados:
-        prox.append([int(x) for x in i])
-   
-    print("prox = ",prox)
-
-    if(len(cadeia)-num == 1):
-        print("chegamos no final da cadeia = ",cadeia[num])
-        if(confere_final(prox)):
-            print("estados chegados = ",prox," - finais = ",finaisI)
-            print("3")
+        
+    if(pos == len(cadeia)-1):
+        if(confere_final(q)==True):
+            print("chegou em estado final")
+            print("Certinho")
             return True
         else:
-            print(1)
-            return False     
-    else:
-        
-        for i in prox:
-            print("vai para ",i,"\n")
-            processaAFN2(i,num+1)
-            print(2)
-            return 
-           
+            print("nao chegou em estado final")        
+            print("nao certinho")
+            return False
+    
+    print(q ," lendo ",cadeia)
 
-def processaAFN3(q,num):
-    print("Estado atual = ",q)
-    print("simbolo atual = ",cadeia[num]," pos = ",num)
+    print(q,"\n\n",transicoes)
 
-    if(not pertence_alfabeto(cadeia[num]) or q==[]):
-        print('O símbolo ',cadeia[num]," não faz parte do alfabeto")
-        return False
-    r=[]
-    for i in transicoesFinais:
-        if(i[0] == q and i[1]==cadeia[num] and i[2] != []):
-            r = i[2]
-
-    prox= [int(x) for x in r]
-
-    if(len(cadeia)-num == 1):
-        print("chegamos no final da cadeia = ",cadeia[num])
-        for i in finaisI:
-            if i in prox:
-                print("estado ",i," chegado , de = ",prox," - finais = ",finaisI)
-                return True
-        
-        print("ERRO - estados chegados = ",prox," - finais = ",finaisI)
-        return False
-    else:
-        print("vai para ",prox,"\n")
-        return processaAFN3(prox,num+1)
+    for i in q:
+        for t in transicoes:
+            
+            if(t[0]==i and t[1]==cadeia[pos]):
+                pos+=1
+                print(q," lendo ",cadeia[pos]," leva a ",t[2])
+                for es in t[2]:
+                    if es != []:
+                        processaAFN2(es)
+    print("deu ruim")
+    return False
 
 
-def resolve_AFN(cadeiai):
+
+
+
+def resolve_AFN(cadeia):
     contCadeia=0
-    i = [estadoInicial]
-    resp = processaAFN3(i,contCadeia)
-    
-    if(resp):
-        print("O autômato reconhece a cadeia : ",cadeia)
-    else:
-        print("O autômato não reconhece a cadeia : ",cadeia)
-
-estadosI = []
-for x in f.readline().split():
-    estadosI.append(x)
-
-print("Q = ",estadosI)
-
-alfabeto = []
-for x in f.readline().split():
-    alfabeto.append(x)
-print("Alfabeto = ",alfabeto)
-
-estadoInicial = int(f.readline()[0])
-print("Estado Inicial = ",estadoInicial)
-
-finaisI = []
-for x in f.readline().split():
-    finaisI.append(int(x))
-print("Estados Finais = ",finaisI)
-
-transicoes = []
-for x in f.readline().split():
-    aux = x.split(",")
-    aux[2] = aux[2].replace(")","").replace("[","").replace("]","").replace(";","")
-    t = (int(x[1]),x[3],list(aux[2]))
-    transicoes.append(t)
-
-print("Delta = ",transicoes,"\n")
-
-cadeia = input("Digite a cadeia a ler analisada pelo autômato:")
-while True:
-    
-    if cadeia != '':
-        break
-    else:
-        print("Este autômato não reconhece cadeias vazias")
-        cadeia = input("Por favor insira uma nova cadeia: ")
-
-
-
-estadosAFD = preparaEstadosAFN_AFD()
-transicoesFinais = preparaTransicoesAFN_AFD(estadosAFD)
-
-AFNtoAFD()
-listaFinal = remove_vazio(listaFinal)
-resolve_AFN(list(cadeia[0]))
-print(transicoesFinais)
-print(estadosAFD)
+    print(processaAFN2(list(cadeia[0]),contCadeia))
