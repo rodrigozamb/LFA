@@ -140,72 +140,46 @@ def confere_final(l):
                     return True
     return False
 
-def processaAFN(q,pos):
 
-    if(pertence_alfabeto(cadeia[pos]) == False):
-        print("simbolo ",cadeia[pos]," eh invalido")
-        print("nao certinho")
+testando = []
+testando2 = []
+
+def AFN_solve():
+    flag = False
+    op = resolve_AFN_RECURSIVO(estadoInicial ,0)
+    caminho = [int(x) for x in testando]
+    #print(caminho)
+    #print(testando2)
+    if(op == -1):
         return False
+    else:
+        for ef in finaisI:
+            if ef in testando2:
+                return True
 
-        
-    if(pos == len(cadeia)-1):
-        if(confere_final(q)==True):
-            print("chegou em estado final")
-            print("Certinho")
-            return True
-        else:
-            print("nao chegou em estado final")        
-            print("nao certinho")
-            return False
-    
-    print("aaaaaaaa")
-    for i in q:
-        for t in transicoes:
-            if(t[0]==i and t[1]==cadeia[pos]):
-                pos+=1
-                print(q," lendo ",cadeia[pos]," leva a ",t[2])
-                for es in t[2]:
-                    if es != []:
-                        processaAFN(es)
     return False
 
-def processaAFN2(q,num):
-    print("Estado atual = ",q)
-    print("simbolo atual = ",cadeia[num]," pos = ",num)
-    if(not pertence_alfabeto(cadeia[num]) or q==[]):
-        print('4')
-        return False
-    
-    proxEstados = []
-    for s in q:
-        for est in transicoesFinais:
-            if(est[0] == s and est[1]==cadeia[num] and est[2]!= []):
-                proxEstados.append(est[2])
+def resolve_AFN_RECURSIVO(q,num):
+    global testando2
 
-    print("proxEstados = ",proxEstados)
-    prox= []
-    for i in proxEstados:
-        prox.append([int(x) for x in i])
-   
-    print("prox = ",prox)
+    #print("n = ",num , "tam = ",len(cadeia))
+    if(num == len(cadeia)):
+      
+      
+        #print("q = ",q,"n = ",num , "tam = ",len(cadeia))
+        testando2.append(int(q))
+        return 0
 
-    if(len(cadeia)-num == 1):
-        print("chegamos no final da cadeia = ",cadeia[num])
-        if(confere_final(prox)):
-            print("estados chegados = ",prox," - finais = ",finaisI)
-            print("3")
-            return True
-        else:
-            print(1)
-            return False     
-    else:
-        
-        for i in prox:
-            print("vai para ",i,"\n")
-            processaAFN2(i,num+1)
-            print(2)
-            return 
-           
+    if cadeia[num] not in alfabeto:
+        return -1
+
+    for i in transicoes:
+        if(i[0]==q and i[1]==cadeia[num]):
+            
+            for j in i[2]:
+                testando.append(j)
+                resolve_AFN_RECURSIVO(int(j),num+1)
+
 
 def processaAFN3(q,num):
     print("Estado atual = ",q)
@@ -234,8 +208,7 @@ def processaAFN3(q,num):
         print("vai para ",prox,"\n")
         return processaAFN3(prox,num+1)
 
-
-def resolve_AFN(cadeiai):
+def resolve_AFN_AFDMODE(cadeiai):
     contCadeia=0
     i = [estadoInicial]
     resp = processaAFN3(i,contCadeia)
@@ -289,6 +262,11 @@ transicoesFinais = preparaTransicoesAFN_AFD(estadosAFD)
 
 AFNtoAFD()
 listaFinal = remove_vazio(listaFinal)
-resolve_AFN(list(cadeia[0]))
-print(transicoesFinais)
-print(estadosAFD)
+#resolve_AFN_AFDMODE(list(cadeia[0]))
+#print(transicoesFinais)
+#print(estadosAFD)
+
+if(AFN_solve()):
+    print("O AFN aceita a cadeia : ",cadeia)
+else:
+    print("O AFN não aceita a cadeia : ",cadeia)
