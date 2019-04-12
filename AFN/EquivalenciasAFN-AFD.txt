@@ -1,0 +1,4 @@
+Equivalência de estados entre o AFN e o AFD
+[0] no AFN equivale ao 0 no AFD
+[0, 1] no AFN equivale ao 1 no AFD
+[0, 2] no AFN equivale ao 2 no AFD

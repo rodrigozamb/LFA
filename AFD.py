@@ -1,5 +1,5 @@
 
-f = open("caso1.txt","r")
+f = open("./AFN/out.txt","r")
 
 def automato(cadeia):
     print("cadeia = ",cadeia,"\n")

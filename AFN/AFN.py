@@ -1,6 +1,6 @@
 f = open("casoAFN.txt","r")
 out = open("out.txt","w")
-
+eq = open("EquivalenciasAFN-AFD.txt","w")
 listaFinal = []
 
 def set_estados(listaEst):
@@ -76,6 +76,31 @@ def preparaTransicoesAFN_AFD(estados):
 
     return listaEst
 
+def simplifica_Transicoes(transicoesFinais):
+    global equivalencias
+    global transicoesSimplificadas
+    global estadosFinaisSimplificados
+    c=0
+    for i in transicoesFinais:
+        (x,y,z) = i
+        if str(x) not in equivalencias:
+            equivalencias[str(x)] = c
+            c+=1
+    
+    for tra in transicoesFinais:
+        (x,y,z) = tra
+        xs = equivalencias[str(x)]
+        ys = int(y)
+        aux = [int (a) for a in z]
+        zs = equivalencias[str(aux)]
+        transicoesSimplificadas.append((xs,ys,zs))
+
+        if (confere_final([aux])):
+            estadosFinaisSimplificados.append(equivalencias[str(aux)])
+        
+    
+    
+
 def calculaProxEstado(Q,simbol):
     aux = []
     for q in Q:
@@ -85,9 +110,10 @@ def calculaProxEstado(Q,simbol):
     return aux
 
 def printa_estados(estadosF):
+    print("asdas   ",estadosF)
     for i in range(len(estadosF)):
-        y = str(estadosF[i]).replace(" ","")
-        out.write(y)
+        y = str(estadosF[i])
+        out.write(str(equivalencias[y]))
         if(i<len(estadosF)-1):
             out.write(" ")
         else:
@@ -102,20 +128,31 @@ def printa_alfabeto():
             out.write("\n")
 
 def printa_finais():
-    for i in range(len(finaisI)):
-        out.write(str(finaisI[i]))
-        if(i<len(finaisI)-1):
+    l = list(set(estadosFinaisSimplificados))
+    for i in range(len(l)):
+        out.write(str(l[i]))
+        if(i<len(l)-1):
             out.write(" ")
         else:
             out.write("\n")
 
 def printa_transicoes(t):
     for i in range(len(t)):
-        out.write(str(t[i]))
+        out.write(str(t[i]).replace(" ",""))
         if(i<len(t)-1):
             out.write(" ")
         else:
             out.write("\n")
+
+def printa_equivalencias():
+    eq.write("Equivalência de estados entre o AFN e o AFD")
+    eq.write("\n")
+    for l in listaFinal:
+        eq.write(str(l).rstrip('\n'))
+        eq.write(" no AFN equivale ao ".rstrip('\n'))
+        eq.write(str(equivalencias[str(l)]).rstrip('\n'))
+        eq.write(" no AFD\n")
+
 
 def AFNtoAFD():
    
@@ -124,7 +161,9 @@ def AFNtoAFD():
     out.write(str(estadoInicial))
     out.write("\n")
     printa_finais()
-    printa_transicoes(transicoesFinais)
+    printa_transicoes(transicoesSimplificadas)
+    out.write(cadeia)
+    printa_equivalencias()
 
 def pertence_alfabeto(a):
     
@@ -179,7 +218,6 @@ def resolve_AFN_RECURSIVO(q,num):
             for j in i[2]:
                 testando.append(j)
                 resolve_AFN_RECURSIVO(int(j),num+1)
-
 
 def processaAFN3(q,num):
     print("Estado atual = ",q)
@@ -246,6 +284,11 @@ for x in f.readline().split():
 
 print("Delta = ",transicoes,"\n")
 
+transicoesSimplificadas = []
+equivalencias = {}
+estadosFinaisSimplificados = []
+
+
 cadeia = input("Digite a cadeia a ler analisada pelo autômato:")
 while True:
     
@@ -260,13 +303,19 @@ while True:
 estadosAFD = preparaEstadosAFN_AFD()
 transicoesFinais = preparaTransicoesAFN_AFD(estadosAFD)
 
-AFNtoAFD()
+
 listaFinal = remove_vazio(listaFinal)
 #resolve_AFN_AFDMODE(list(cadeia[0]))
-#print(transicoesFinais)
 #print(estadosAFD)
 
 if(AFN_solve()):
     print("O AFN aceita a cadeia : ",cadeia)
 else:
     print("O AFN não aceita a cadeia : ",cadeia)
+simplifica_Transicoes(transicoesFinais)
+
+AFNtoAFD()
+print(equivalencias)
+print(transicoesSimplificadas)
+print(listaFinal)
+print(list(set(estadosFinaisSimplificados)))
