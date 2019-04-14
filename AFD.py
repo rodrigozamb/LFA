@@ -13,7 +13,8 @@ def automato(cadeia):
         #podemos melhorar o desempenho aprimorando essa busca
         for t in transicoes:
             if(t[0]==i and t[1]==simbolo):
-                #print(i," lendo ",simbolo," -> ", t[2])
+                print("Usando a transição - ",t)
+                print("Estado ",i," lendo o símbolo ",simbolo," leva ao estado ", t[2],"\n")
                 i = t[2]
                 break
                 
