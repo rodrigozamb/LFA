@@ -1,3 +1,4 @@
+import pygame
 
 #abertura de arquivos para leitura dos dados referentes ao AFN
 # e de arquivos que servirão de entrada para o AFD e esclarecimentos gerais
