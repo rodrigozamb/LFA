@@ -1,6 +1,7 @@
 import pygame
 
-
+a = "a -> n -> c"
+print(a[::-1].replace("c >- ",""))
 pygame.init()
 screen = pygame.display.set_mode((640, 480))
 pygame.display.set_caption("Autômato Finito Não-Determinístico")

@@ -10,7 +10,7 @@ eq = open("EquivalenciasAFN-AFD.txt","w")
 listaFinal = []
 path = []
 pathFinais = []
-
+superCaminhos = []
 def set_estados(listaEst):
     matches = [x for x in listaEst if (x not in listaFinal)]    #Função que retira a repetição de estados 
     return matches
@@ -170,10 +170,15 @@ def confere_final(l):
                     return True
     return False
 
+teste = []
 def AFN_solve():
     flag = False       #função de solução característica de um AFN
+    
+    interface_Start()
     op = resolve_AFN_RECURSIVO(estadoInicial ,0) 
     caminho = [int(x) for x in path]
+    interface_End_Sucesso()
+    
 
     if(op == -1):
         return False
@@ -185,21 +190,59 @@ def AFN_solve():
     return False
 
 def resolve_AFN_RECURSIVO(q,num):
-    global pathFinais 
+    global pathFinais
+    global teste
+    global progEstados
+    global interSimbolo
+    global superCaminhos
                                     #função recursiva que resolve o AFN, criando todo o
     if(num == len(cadeia)):         # caminho da recursão
         pathFinais.append(int(q))
+        superCaminhos.append(progEstados)
+        message("Encontramos um caminho completo.. Clique para continuar",(128,128,128),129,336)
+        pygame.display.update()
+        pausar()
         return 0
 
     if cadeia[num] not in alfabeto:
+        interface_SymbolError(cadeia[num])
+  
         return -1
 
+
     for i in transicoes:
-        if(i[0]==q and i[1]==cadeia[num]):
-            
+        if(i[0]==q and i[1]==cadeia[num]):            
+           
             for j in i[2]:
                 path.append(j)
-                resolve_AFN_RECURSIVO(int(j),num+1)
+                teste.append(j)
+                
+                estAux = " -> "+str(j)
+                progEstados += estAux
+                interSimbolo = cadeia[num]
+                screen.fill((0,0,0))
+                layout(progEstados,interSimbolo)
+                pygame.display.update()
+                pygame.time.wait(600)
+
+                print(q," lendo o símbolo ",cadeia[num]," leva ao estado ",j)
+                resolve_AFN_RECURSIVO(int(j),num+1)    
+
+                if teste != []:
+                    
+                    progEstados = progEstados[:-5]
+                    interSimbolo = cadeia[num]
+                    screen.fill((0,0,0))
+                    alertBack = font.render("Backtracking..",True,(255,0,0))
+                    screen.blit(alertBack, [300,28])
+                    layout(progEstados,interSimbolo)
+                    pygame.display.update()
+                    pygame.time.wait(300)
+                    
+                    print("Voltando na recursão e excluindo o ultimo estado alcançado..")
+                    print(teste,"\n")
+                    del teste[-1]
+                
 
 def processaAFN3(q,num):
     print("Estado atual = ",q)    #função que utiliza os estados traduzidos para solucionar o AFN
@@ -306,11 +349,6 @@ listaFinal = remove_vazio(listaFinal)
 #resolve_AFN_AFDMODE(list(cadeia[0]))
 #print(estadosAFD)
 
-#resolve o AFN na sua forma característica 
-if(AFN_solve()):
-    print("O AFN aceita a cadeia : ",cadeia)
-else:
-    print("O AFN não aceita a cadeia : ",cadeia)
 
 #simplifica as transições de estados de forma que o algoritmo do AFD
 #consiga ler propriamente
@@ -318,3 +356,106 @@ simplifica_Transicoes(transicoesFinais)
 
 #Função que gera o arquivo fonte base para o AFD
 AFNtoAFD()
+print("t = ",transicoes)
+
+###############################################################################
+
+
+def message(msg,color,x,y): 
+    text = font.render(msg,True,color)
+    screen.blit(text, [x,y])
+
+def rev(s):
+	return s[::-1]
+
+def pausar():
+    while True:
+        for event in pygame.event.get():
+            
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                return 0
+
+def layout(progEstados,interSimbolo):
+    message("Progressão Recursiva:",branco,28,28)
+    message(progEstados,branco,40,220)
+    message("Símbolo atual:",branco,328,70)
+    message(interSimbolo,branco,328,85)
+    
+    
+def interface_Start():
+    screen.fill((0,0,0))
+    font2 = pygame.font.Font("freesansbold.ttf",30)
+    text_surface = font2.render("Autômato Finito Não Determinístico",True,(225,158,0))
+    screen.blit(text_surface,[70,182])
+    message("Clique para iniciar o processo..",branco,150,320)
+    pygame.display.update()
+    pausar()
+
+def interface_End_Sucesso():
+
+    screen.fill((0,0,0))
+    message("O Autômato reconhece as cadeias",branco,30,52)
+
+    q = 120
+    for i in superCaminhos:
+
+        if(eh_valida(i)):
+            message(str(i),(0,255,0),140,q)
+        else:
+            message(str(i),(255,0,0),140,q)
+        q+=18
+
+    message("Clique para fechar..",branco,150,320)
+    pygame.display.update()
+    pausar()
+
+def interface_End_Falha():
+
+    screen.fill((0,0,0))
+    font2 = pygame.font.Font("freesansbold.ttf",30)
+    text_surface = font2.render("O Autômato não reconhece a cadeia",True,(204,0,0))
+    screen.blit(text_surface,[70,182])
+    message("Clique para fechar..",branco,150,320)
+    pygame.display.update()
+    pausar()
+
+def eh_valida(l):
+    a = l[::-1]
+    if int(a[0]) in finaisI:
+        return True
+    else:
+        return False
+
+def interface_SymbolError(s):
+
+    screen.fill((0,0,0))
+    font2 = pygame.font.Font("freesansbold.ttf",30)
+    aux = "Símbolo inválido identificado - '"+s+"'"
+    text_surface = font2.render(aux,True,(0,38,153))
+    screen.blit(text_surface,[70,182])
+    message("Clique para fechar..",branco,150,320)
+    pygame.display.update()
+    pausar()
+
+progEstados = ""
+progCadeia = ""
+interSimbolo = ""
+interEstadoAtual = ""
+interTransicao = ""
+branco = (250,250,250)
+
+
+
+pygame.init()
+screen = pygame.display.set_mode((640, 480))
+pygame.display.set_caption("Autômato Finito Não Determinístico")
+icone = pygame.image.load('ICON32N.png')
+pygame.display.set_icon(icone)
+
+font = pygame.font.SysFont(None, 25)
+
+#resolve o AFN na sua forma característica 
+if(AFN_solve()):
+    print("O AFN aceita a cadeia : ",cadeia)
+else:
+    print("O AFN não aceita a cadeia : ",cadeia)

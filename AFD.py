@@ -39,7 +39,6 @@ def automato(cadeia):
         layout(progEstados,progCadeia,interEstadoAtual,interSimbolo,interTransicao)
         pygame.display.update()
         
-        print("ASADAAAAAAAAA")
 
     if i in finais:
         pausar()
@@ -51,6 +50,7 @@ def automato(cadeia):
         pygame.display.update()
         pausar()
         interface_End_Sucesso()
+        pygame.quit()
         return True
     else:
         pausar()
@@ -62,15 +62,12 @@ def automato(cadeia):
         pygame.display.update()
         pausar()
         interface_End_Falha()
-        
+        pygame.quit()
         return False
-
-
 
 estados = []
 for x in f.readline().split():
     estados.append(x)
-
 print("Q = ",estados)
 
 alfabeto = []
@@ -86,19 +83,15 @@ for x in f.readline().split():
     finais.append(int(x))
 print("Estados Finais = ",finais)
 
-
 transicoes = []
 for x in f.readline().split():
     t = (int(x[1]),x[3],int(x[5]))
     transicoes.append(t)
-
 print("Delta = ",transicoes)
 
 cadeia = f.readline()
 
-
-
-#############################################################################
+########################### Inteface Gráfica AFD##################################################
 
 
 pygame.init()
@@ -107,9 +100,7 @@ pygame.display.set_caption("Autômato Finito Determinístico")
 icone = pygame.image.load('ICON32.png')
 pygame.display.set_icon(icone)
 
-done = False
 font = pygame.font.SysFont(None, 25)
-aqui = "10010101101011"
 
 def message(msg,color,x,y): 
     text = font.render(msg,True,color)
@@ -123,7 +114,6 @@ def pausar():
         for event in pygame.event.get():
             
             if event.type == pygame.MOUSEBUTTONDOWN:
-                print("despausou")
                 return 0
 
 def layout(progEstados,progCadeia,interEstadoAtual,interSimbolo,interTransicao):
@@ -140,19 +130,15 @@ def layout(progEstados,progCadeia,interEstadoAtual,interSimbolo,interTransicao):
 
 def interface_Start():
     screen.fill((0,0,0))
-
     font2 = pygame.font.Font("freesansbold.ttf",30)
     text_surface = font2.render("Autômato Finito Determinístico",True,(126,45,126))
     screen.blit(text_surface,[70,182])
     message("Clique para iniciar o processo..",branco,150,320)
     pygame.display.update()
     
-
-
 def interface_End_Sucesso():
 
     screen.fill((0,0,0))
-
     font2 = pygame.font.Font("freesansbold.ttf",30)
     text_surface = font2.render("O Autômato reconhece a cadeia",True,(51,255,51))
     screen.blit(text_surface,[70,182])
@@ -163,7 +149,6 @@ def interface_End_Sucesso():
 def interface_End_Falha():
 
     screen.fill((0,0,0))
-
     font2 = pygame.font.Font("freesansbold.ttf",30)
     text_surface = font2.render("O Autômato não reconhece a cadeia",True,(204,0,0))
     screen.blit(text_surface,[70,182])
@@ -174,7 +159,6 @@ def interface_End_Falha():
 def interface_SymbolError(s):
 
     screen.fill((0,0,0))
-
     font2 = pygame.font.Font("freesansbold.ttf",30)
     aux = "Símbolo inválido identificado - '"+s+"'"
     text_surface = font2.render(aux,True,(0,38,153))
@@ -183,18 +167,12 @@ def interface_SymbolError(s):
     pygame.display.update()
     pausar()
 
-X1 = 7
-Y1 = 15
-Xbase = 261
-Ybase = 450
-
 progEstados = ""
 progCadeia = ""
 interSimbolo = ""
 interEstadoAtual = ""
 interTransicao = ""
-
-i = 0
 branco = (250,250,250)
+
 
 automato(cadeia)
