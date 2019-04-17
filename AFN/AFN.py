@@ -396,7 +396,6 @@ simplifica_Transicoes(transicoesFinais)
 
 #Função que gera o arquivo fonte base para o AFD
 AFNtoAFD()
-print("t = ",transicoes)
 
 ###############################################################################
 
