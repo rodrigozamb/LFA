@@ -1,4 +1,14 @@
+import sys
 import pygame
+
+pygame.init()
+
+screen = pygame.display.set_mode((640, 480))
+pygame.display.set_caption("Autômato Finito Não Determinístico")
+icone = pygame.image.load('ICON32N.png')
+pygame.display.set_icon(icone)
+font = pygame.font.SysFont(None, 25)
+
 
 #abertura de arquivos para leitura dos dados referentes ao AFN
 # e de arquivos que servirão de entrada para o AFD e esclarecimentos gerais
@@ -11,6 +21,7 @@ listaFinal = []
 path = []
 pathFinais = []
 superCaminhos = []
+possivel = False
 def set_estados(listaEst):
     matches = [x for x in listaEst if (x not in listaFinal)]    #Função que retira a repetição de estados 
     return matches
@@ -206,7 +217,6 @@ def resolve_AFN_RECURSIVO(q,num):
 
     if cadeia[num] not in alfabeto:
         interface_SymbolError(cadeia[num])
-  
         return -1
 
 
@@ -281,6 +291,31 @@ def resolve_AFN_AFDMODE(cadeiai):
     else:
         print("O autômato não reconhece a cadeia : ",cadeia)
 
+branco = (250,250,250)
+def pausar():
+    while True:
+        for event in pygame.event.get():
+            
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                return 0
+
+def interface_vazio_Falha():
+    screen.fill((0,0,0))
+    font2 = pygame.font.Font("freesansbold.ttf",30)
+    text_surface = font2.render("O AFN não reconhece a cadeia vazia",True,(255,0,0))
+    screen.blit(text_surface,[70,182])
+    message("Clique para fechar..",(255,255,255),150,320)
+    pygame.display.update()
+    pausar()
+
+def interface_vazio_Sucesso():
+    screen.fill((0,0,0))
+    font2 = pygame.font.Font("freesansbold.ttf",30)
+    text_surface = font2.render("O AFN reconhece a cadeia vazia",True,(0,255,0))
+    screen.blit(text_surface,[70,182])
+    message("Clique para fechar..",branco,150,320)
+    pygame.display.update()
+    pausar()
 
 #inicialização e preenchimento de uma lista que armazenará os estados descritos
 #no arquivo fonte do AFN
@@ -324,18 +359,23 @@ transicoesSimplificadas = []
 equivalencias = {}
 estadosFinaisSimplificados = []
 
+def message(msg,color,x,y): 
+    text = font.render(msg,True,color)
+    screen.blit(text, [x,y])
+
+
 #inicialização de leitura da cadeia a ser processada pelo autômato
 cadeia = input("Digite a cadeia a ler analisada pelo autômato:")
 
-#laço de repetiçao infinito que trata o cado de entrada de cadeias vazias e cadeias
-#válidas
-while True:    
-    if cadeia != '':
-        break
+if (estadoInicial in finaisI and cadeia ==''):
+    interface_vazio_Sucesso()
+    pygame.display.update()
+else:
+    if (estadoInicial not in finaisI and cadeia ==''):
+        interface_vazio_Falha()
+        pygame.display.update()
     else:
-        print("Este autômato não reconhece cadeias vazias")
-        cadeia = input("Por favor insira uma nova cadeia: ")
-
+        possivel = True
 
 #coversão de estados do autômato AFN para estados de um AFD
 estadosAFD = preparaEstadosAFN_AFD()
@@ -361,26 +401,15 @@ print("t = ",transicoes)
 ###############################################################################
 
 
-def message(msg,color,x,y): 
-    text = font.render(msg,True,color)
-    screen.blit(text, [x,y])
-
 def rev(s):
 	return s[::-1]
 
-def pausar():
-    while True:
-        for event in pygame.event.get():
-            
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                return 0
 
 def layout(progEstados,interSimbolo):
     message("Progressão Recursiva:",branco,28,28)
     message(progEstados,branco,40,220)
     message("Símbolo atual:",branco,328,70)
     message(interSimbolo,branco,328,85)
-    
     
 def interface_Start():
     screen.fill((0,0,0))
@@ -419,6 +448,10 @@ def interface_End_Falha():
     pygame.display.update()
     pausar()
 
+
+
+
+
 def eh_valida(l):
     a = l[::-1]
     if int(a[0]) in finaisI:
@@ -442,20 +475,13 @@ progCadeia = ""
 interSimbolo = ""
 interEstadoAtual = ""
 interTransicao = ""
-branco = (250,250,250)
 
 
 
-pygame.init()
-screen = pygame.display.set_mode((640, 480))
-pygame.display.set_caption("Autômato Finito Não Determinístico")
-icone = pygame.image.load('ICON32N.png')
-pygame.display.set_icon(icone)
 
-font = pygame.font.SysFont(None, 25)
-
-#resolve o AFN na sua forma característica 
-if(AFN_solve()):
-    print("O AFN aceita a cadeia : ",cadeia)
-else:
-    print("O AFN não aceita a cadeia : ",cadeia)
+if possivel == True:        
+    #resolve o AFN na sua forma característica 
+    if(AFN_solve()):
+        print("O AFN aceita a cadeia : ",cadeia)
+    else:
+        print("O AFN não aceita a cadeia : ",cadeia)
